@@ -1,0 +1,35 @@
+#Assignment | Day:7 
+#Using Ansible Modules, Create Swap memory using swap File if Swap does not exist in the node machine , if it exists increase the swap Size 
+
+---
+- name: create a playbook to create swap memory
+  hosts: demo
+  become: true
+  tasks:
+          - name: create a swapfile
+            command: sudo fallocate -l 1G /swapfile
+            
+
+          - name: change the file permissons
+            file:
+                    path: /swapfile
+                    owner: root
+                    group: root
+                    mode: 0600
+ 
+          - name: check swapfile type
+            command: file /swapfile
+            register: swapfile         
+           
+         
+          - name: make swap file
+            command: "sudo mkswap /swapfile"
+          
+          
+          - name: write the swap entry  in fstab
+            action: lineinfile dest=/etc/fstab regexp="swapfile"  line="/swapfile swap swap defaults 0 0" state=present
+
+          - name: mount swap
+            command: "sudo swapon /swapfile"
+
+

@@ -1,0 +1,21 @@
+--- 
+- name: install the lvm2 on the linux
+  hosts: all
+  become: true
+  tasks:
+        - name: installation of lvm2
+          package: name=lvm2 state=latest
+
+        - name: create the partition
+          parted:
+                  device: /dev/xvda
+                  number: 2
+                  flags: [ lvm ]
+                  state: present
+                  part_start: 2MiB
+                  part_end: 1GiB
+                
+
+
+                  
+                

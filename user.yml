@@ -1,0 +1,37 @@
+---
+- name: create 5 user with password
+  hosts: all
+  become: yes
+  vars:
+    users:
+    - username: "MOHIT"
+    - username: "RAHUL"
+    - username: "VIJAY"
+    - username: "NEERAJ"
+    - username: "PIYUSH"
+  
+  tasks:
+  
+  - name: adding the fantastic_five group
+    group:
+     name: fantastic_five
+     state: present
+
+  - name: adding user {{ item.username }}
+    user:
+      name: "{{ item.username }}"
+      create_home: yes
+      shell: /bin/bash
+      password: "{{ 'password' | password_hash('sha512') }}"
+      groups: fantastic_five
+      generate_ssh_key: true
+    with_items: "{{ users }}"
+ 
+  - name: create a directory called ninja
+    file:
+             path: /var/ninja/
+             owner: MOHIT
+             group: fantastic_five
+             mode: 0755
+             state: directory
+ 
