@@ -6,9 +6,15 @@
   hosts: demo
   become: true
   tasks:
+
+          - name: check if swap file exits
+            stat:
+                    path: /swapfile
+            register: swapfile_check
+
           - name: create a swapfile
             command: sudo fallocate -l 1G /swapfile
-            
+            when: not swapfile_check.stat.exists
 
           - name: change the file permissons
             file:
@@ -24,12 +30,12 @@
          
           - name: make swap file
             command: "sudo mkswap /swapfile"
-          
+            when: not swapfile_check.stat.exists         
           
           - name: write the swap entry  in fstab
             action: lineinfile dest=/etc/fstab regexp="swapfile"  line="/swapfile swap swap defaults 0 0" state=present
 
           - name: mount swap
             command: "sudo swapon /swapfile"
-
-
+            when: not swapfile_check.stat.exists
+              
